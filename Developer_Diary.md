@@ -14,3 +14,19 @@
 
 ---
 <img width="804" height="716" alt="image" src="https://github.com/user-attachments/assets/8c4f755e-c008-4627-9c67-e95d752ab85c" />
+
+## Week 1: Custom Tool Implementation & Testing
+
+* **Date:** 2026-09-22
+* **Goal:** Implement the Python calculation function `calculate_budget` and verify its behavior using assertion test cases.
+
+### AI Interaction #2: Custom Tool & Assert Testing
+* **My Request:** "I have defined my pseudocode for the 50/30/20 budget calculator. Now write the Python function calculate_budget(income) based on Module 5. Include edge-case checks for zero or negative values using if/else, format output with f-strings, and write assert statements to test standard, zero, negative, and decimal inputs."
+* **AI's Response:** Generated the Python function `calculate_budget` and four `assert` test cases covering positive values, zero, negative numbers, and float decimals.
+* **My Critique & Decision:** The solution is clear and simple. I verified that the code uses standard Python formatting (`.2f`) learned in Module 2 and basic conditionals (`if/else`) from Module 3. All four `assert` statements passed successfully, confirming robust handling of bad user input (Requirement R3 & R5).
+* **Screenshot:**
+  <img width="700" height="845" alt="image" src="https://github.com/user-attachments/assets/ee146711-3358-433e-bbf8-9307b80ee78c" />
+* Note: While testing, I fixed an AssertionError in Test Case 4 caused by a typo in the expected string ($301.10 instead of $300.10 for 20% of $1500.50). Correcting this allowed all tests to pass successfully.
+<img width="1209" height="936" alt="image" src="https://github.com/user-attachments/assets/d92f4ff3-1ce8-4745-8a5d-e36c1f0975b4" />
+
+---
