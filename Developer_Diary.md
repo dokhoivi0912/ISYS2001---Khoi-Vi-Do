@@ -30,3 +30,11 @@
 <img width="1209" height="936" alt="image" src="https://github.com/user-attachments/assets/d92f4ff3-1ce8-4745-8a5d-e36c1f0975b4" />
 
 ---
+
+### AI Interaction #1 (Update)
+* **Date:** 2026-09-24
+* **My Request:** "I want to expand my project design in Step 2 to support processing an uploaded CSV transaction file via Pandas (Module 7) alongside direct income input."
+* **AI's Response:** Updated Step 1 to Step 3 of the design to explicitly include optional CSV file inputs for transaction history analysis.
+* **My Critique & Decision:** I decided to adopt this hybrid input model (direct `income` or CSV file) because it strengthens compliance with Requirement R2 (Grounding AI responses in user transaction data) while maintaining full compatibility with my existing 50/30/20 calculation logic.
+
+---
