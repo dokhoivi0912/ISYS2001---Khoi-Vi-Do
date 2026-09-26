@@ -75,3 +75,41 @@
 
 
 ---
+
+## Week 1: Interactive Interface Development with Gradio (R4)
+
+* **Date:** 2026-09-26
+* **Goal:** Design and launch an interactive web UI using Gradio to integrate the budget calculator tool, CSV transaction processing, and the Gemini AI advisor.
+
+### AI Interaction #4: Gradio Interface Integration
+* **Date:** 2026-09-26
+* **My Request:** "Help me build a user-friendly web interface using Gradio based on Module 9 for my Student Budget Coach application (Requirement R4). Create a tabbed interface (gr.Blocks) containing three tabs: 1) Manual 50/30/20 Budget Calculator, 2) CSV Transaction Processing via Pandas, and 3) Gemini AI Advisor Chatbot interface."
+* **AI's Response:** Provided Python code leveraging `gradio.Blocks` to build a clean 3-tab user interface connecting `calculate_budget()`, `process_csv_income()`, and `ask_gemini_advisor()`.
+* **My Critique & Decision:** I accepted the tabbed interface design because it separates input modes logically for non-technical users while fulfilling Requirement R4. Users can easily toggle between entering raw income amounts, uploading a CSV file of transaction records, or asking questions directly to the Gemini AI advisor.
+* **Screenshot:**
+
+<img width="260" height="944" alt="image" src="https://github.com/user-attachments/assets/c1415378-56e9-47fa-96f8-5c202363862c" />
+
+---
+
+* **Function 1:** Users enter raw income amounts
+
+<img width="1895" height="935" alt="image" src="https://github.com/user-attachments/assets/83738b38-a9de-48a1-9717-fb9855fe9444" />
+
+---
+
+* **Function 2:** Users upload their own CSV file of transaction records
+
+<img width="1914" height="941" alt="image" src="https://github.com/user-attachments/assets/f64477c5-4653-418f-8667-fb5cb1354764" />
+
+---
+
+* **Function 3:** Users ask questions directly to the Gemini AI for financial advice
+
+<img width="1914" height="940" alt="image" src="https://github.com/user-attachments/assets/456944e4-1638-4968-88f7-f2ec012de464" />
+
+
+
+
+
+---
