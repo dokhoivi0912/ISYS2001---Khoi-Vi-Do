@@ -108,6 +108,21 @@
 
 <img width="1914" height="940" alt="image" src="https://github.com/user-attachments/assets/456944e4-1638-4968-88f7-f2ec012de464" />
 
+## Week 2: Requirement Fixes Based on Self-Review
+
+### AI Interaction #5: Replacing the SDK with a direct `requests.post()` call (R1)
+
+**Date:** 2026-10-06
+
+**My Prompt:** "My Gemini integration currently uses the `google.generativeai` SDK, but the unit's tool list specifically names `requests` for any web API call, and R1 says I should be writing the code that calls the model myself. Rewrite `ask_gemini_advisor` to call the Gemini REST endpoint directly with `requests.post()`, and add a guardrail to the system instruction so the assistant handles off-topic or unclear questions sensibly instead of just answering anything."
+
+**AI's Response:** Replaced `genai.GenerativeModel(...)` / `model.generate_content(...)` with a `call_gemini()` function that builds the JSON payload itself (`systemInstruction` + `contents`) and posts it to `https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent`, wrapped in `try/except` for network errors and malformed responses. Added two sentences to `SYSTEM_INSTRUCTION` telling the model to decline off-topic questions politely and ask a clarifying question when a question is unclear.
+
+**My Critique & Decision:** Accepted. Every line of the API call is now something I wrote and can explain, instead of SDK internals I'd have to guess at in Assessment 3.
+
+**Screenshot:**
+
+<img width="1463" height="611" alt="image" src="https://github.com/user-attachments/assets/615787ad-56ef-47c6-97fd-9d35a246666f" />
 
 
 
