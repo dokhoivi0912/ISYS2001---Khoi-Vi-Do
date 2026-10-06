@@ -158,3 +158,12 @@
 
 <img width="1444" height="705" alt="image" src="https://github.com/user-attachments/assets/8c4aa8e7-4107-4d35-b8e2-ce48c367eefe" />
 
+### AI Interaction #11: Fixing a stale R4 Gradio cell left over from before the R1/R2 rewrites
+
+**Date:** 2026-10-06
+
+**My Prompt:** "Check if my R4 (Gradio) cell is okay now that I've rewritten R1, R2, and R3."
+
+**AI's Response:** Found that the R4 cell was still the original, unedited version - it called `process_csv_income()`, which no longer exists after the R2 rewrite (replaced by `load_transactions_df` + `analyze_transactions` + `compare_to_recommended`), and used the old `google.generativeai` SDK pattern instead of the `requests`-based `ask_gemini_advisor()` from the R1 rewrite. Running the app as-is would throw `NameError` the moment a user clicked "Process CSV File" or "Ask Gemini Advisor". Rewrote `run_csv_processor()` and `run_ai_advisor()` to call the current function names and return the richer actual-vs-recommended breakdown instead of a flat net-income summary.
+
+**My Critique & Decision:** Accepted. This was a genuine bug, not a style choice - I'd updated three core functions over several sessions but hadn't checked that the interface calling them was updated too. Good reminder to always re-test the full `Run all` -> click through every tab flow after changing a function signature, not just the cell I was actively editing.
