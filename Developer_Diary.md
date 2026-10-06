@@ -128,3 +128,18 @@
 
 
 ---
+
+### AI Interaction #7: Grounding the budget analysis in actual category spending, not a single re-split total (R2)
+
+**Date:** 2026-10-06
+
+**My Prompt:** "My process_csv_income function just sums every Amount in the CSV into one net_income number, then re-runs the same 50/30/20 split on it. Two CSVs with the same total would produce an identical result - that doesn't actually ground the analysis in my real spending. How do I fix this to compare actual category spending against the 50/30/20 targets?"
+
+**AI's Response:** Pointed out that summing every row (income minus expenses) and treating that as "income" for a 50/30/20 split applies the rule to leftover cash rather than gross income, which isn't how the rule is meant to work. Proposed splitting the logic into `load_transactions_df` (file I/O) and `analyze_transactions` (pure logic), with a `CATEGORY_MAP` dictionary bucketing each transaction's Category into Essentials/Wants/Savings/Income, so the app reports actual dollars and percentage spent per bucket against the 50/30/20 target.
+
+**My Critique & Decision:** Accepted the overall approach. Running it against `student_transactions.csv` shows the student spent about 90% of income on Essentials and 0% on Savings - a result a flat re-split total could never surface. I also had the AI change how a zero/negative net income is handled: instead of blocking it as an "invalid input" error like the manual-entry `calculate_budget` path correctly does, it's now an overspending *warning*, since spending more than you earned is a real, useful thing to flag, not bad input to reject.
+
+### AI Interaction #8: Keeping the analysis code within the unit's scope (ground rule)
+**Screenshot:**
+
+<img width="1777" height="581" alt="image" src="https://github.com/user-attachments/assets/9d61c5ac-79d3-40c5-9d67-7bd53d70894f" />
