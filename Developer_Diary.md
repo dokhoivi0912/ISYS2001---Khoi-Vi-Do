@@ -129,7 +129,7 @@
 
 ---
 
-### AI Interaction #7: Grounding the budget analysis in actual category spending, not a single re-split total (R2)
+### AI Interaction #6: Grounding the budget analysis in actual category spending, not a single re-split total (R2)
 
 **Date:** 2026-10-06
 
@@ -139,18 +139,18 @@
 
 **My Critique & Decision:** Accepted the overall approach. Running it against `student_transactions.csv` shows the student spent about 90% of income on Essentials and 0% on Savings - a result a flat re-split total could never surface. I also had the AI change how a zero/negative net income is handled: instead of blocking it as an "invalid input" error like the manual-entry `calculate_budget` path correctly does, it's now an overspending *warning*, since spending more than you earned is a real, useful thing to flag, not bad input to reject.
 
-### AI Interaction #8: Keeping the analysis code within the unit's scope (ground rule)
+### AI Interaction #7: Keeping the analysis code within the unit's scope (ground rule)
 **Screenshot:**
 
 <img width="1777" height="581" alt="image" src="https://github.com/user-attachments/assets/9d61c5ac-79d3-40c5-9d67-7bd53d70894f" />
 
-### AI Interaction #9: Testing the Pandas/CSV logic, not just calculate_budget (R5)
+### AI Interaction #8: Testing the Pandas/CSV logic, not just calculate_budget (R5)
 
 **Date:** 2026-10-06
 
 **My Prompt:** "My only tests so far are on calculate_budget. The CSV-processing functions (load_transactions_df, analyze_transactions, compare_to_recommended) - the actual R2 logic - have zero tests. Add proper assert-based tests for them, covering normal cases and edge/invalid-input cases."
 
-**AI's Response:** Added tests for: a missing CSV file, a CSV missing a required column (built in-memory with io.StringIO instead of a second file on disk), a CSV with a non-numeric Amount value (confirming the bad row is dropped and reported, not crashing the load), a small hand-checkable DataFrame to confirm analyze_transactions' bucket totals are correct, an empty DataFrame, a transaction with a category not in CATEGORY_MAP (confirmed it's reported as "uncategorised" rather than silently dropped), the normal case for compare_to_recommended, and both the negative and exactly-zero net income boundary cases.
+**AI's Response:** Added tests for: a missing CSV file, a CSV missing a required column (written to a small temporary CSV on disk with plain `open()`/`.write()`, read back with `load_transactions_df`), a CSV with a non-numeric Amount value (confirming the bad row is dropped and reported, not crashing the load), a small hand-checkable DataFrame to confirm analyze_transactions' bucket totals are correct, an empty DataFrame, a transaction with a category not in CATEGORY_MAP (confirmed it's reported as "uncategorised" rather than silently dropped), the normal case for compare_to_recommended, and both the negative and exactly-zero net income boundary cases. The first draft of these edge-case tests had built the broken CSVs in memory with `io.StringIO`, but that technique isn't something this unit actually taught, so it was rewritten to use plain file writing instead — see the scope-compliance note above.
 
 **My Critique & Decision:** Kept all of them. Because load_transactions_df and analyze_transactions are split into an I/O layer and a pure logic layer (see Interaction #7), I could test the real decision logic directly with small hand-built DataFrames instead of only testing against the one sample CSV file. Running the full suite (18 assertions total, across all four functions) passes cleanly - this is real evidence of edge-case coverage for R5, not just a repeat of the same happy-path check four times.
 
@@ -158,7 +158,7 @@
 
 <img width="1444" height="705" alt="image" src="https://github.com/user-attachments/assets/8c4aa8e7-4107-4d35-b8e2-ce48c367eefe" />
 
-### AI Interaction #11: Fixing a stale R4 Gradio cell left over from before the R1/R2 rewrites
+### AI Interaction #9: Fixing a stale R4 Gradio cell left over from before the R1/R2 rewrites
 
 **Date:** 2026-10-06
 
