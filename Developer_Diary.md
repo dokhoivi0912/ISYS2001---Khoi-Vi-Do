@@ -143,3 +143,18 @@
 **Screenshot:**
 
 <img width="1777" height="581" alt="image" src="https://github.com/user-attachments/assets/9d61c5ac-79d3-40c5-9d67-7bd53d70894f" />
+
+### AI Interaction #9: Testing the Pandas/CSV logic, not just calculate_budget (R5)
+
+**Date:** 2026-10-06
+
+**My Prompt:** "My only tests so far are on calculate_budget. The CSV-processing functions (load_transactions_df, analyze_transactions, compare_to_recommended) - the actual R2 logic - have zero tests. Add proper assert-based tests for them, covering normal cases and edge/invalid-input cases."
+
+**AI's Response:** Added tests for: a missing CSV file, a CSV missing a required column (built in-memory with io.StringIO instead of a second file on disk), a CSV with a non-numeric Amount value (confirming the bad row is dropped and reported, not crashing the load), a small hand-checkable DataFrame to confirm analyze_transactions' bucket totals are correct, an empty DataFrame, a transaction with a category not in CATEGORY_MAP (confirmed it's reported as "uncategorised" rather than silently dropped), the normal case for compare_to_recommended, and both the negative and exactly-zero net income boundary cases.
+
+**My Critique & Decision:** Kept all of them. Because load_transactions_df and analyze_transactions are split into an I/O layer and a pure logic layer (see Interaction #7), I could test the real decision logic directly with small hand-built DataFrames instead of only testing against the one sample CSV file. Running the full suite (18 assertions total, across all four functions) passes cleanly - this is real evidence of edge-case coverage for R5, not just a repeat of the same happy-path check four times.
+
+**Screenshot:** 
+
+<img width="1444" height="705" alt="image" src="https://github.com/user-attachments/assets/8c4aa8e7-4107-4d35-b8e2-ce48c367eefe" />
+
