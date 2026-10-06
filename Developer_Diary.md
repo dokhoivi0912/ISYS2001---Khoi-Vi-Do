@@ -139,12 +139,11 @@
 
 **My Critique & Decision:** Accepted the overall approach. Running it against `student_transactions.csv` shows the student spent about 90% of income on Essentials and 0% on Savings - a result a flat re-split total could never surface. I also had the AI change how a zero/negative net income is handled: instead of blocking it as an "invalid input" error like the manual-entry `calculate_budget` path correctly does, it's now an overspending *warning*, since spending more than you earned is a real, useful thing to flag, not bad input to reject.
 
-### AI Interaction #7: Keeping the analysis code within the unit's scope (ground rule)
 **Screenshot:**
 
 <img width="1777" height="581" alt="image" src="https://github.com/user-attachments/assets/9d61c5ac-79d3-40c5-9d67-7bd53d70894f" />
 
-### AI Interaction #8: Testing the Pandas/CSV logic, not just calculate_budget (R5)
+### AI Interaction #7: Testing the Pandas/CSV logic, not just calculate_budget (R5)
 
 **Date:** 2026-10-06
 
@@ -158,7 +157,7 @@
 
 <img width="1444" height="705" alt="image" src="https://github.com/user-attachments/assets/8c4aa8e7-4107-4d35-b8e2-ce48c367eefe" />
 
-### AI Interaction #9: Fixing a stale R4 Gradio cell left over from before the R1/R2 rewrites
+### AI Interaction #8: Fixing a stale R4 Gradio cell left over from before the R1/R2 rewrites
 
 **Date:** 2026-10-06
 
