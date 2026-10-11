@@ -122,9 +122,21 @@
 
 **Screenshot:**
 
+<img width="247" height="677" alt="image" src="https://github.com/user-attachments/assets/0a1f9f13-441c-4191-bd16-69cb678f3529" />
+
+
 <img width="1463" height="611" alt="image" src="https://github.com/user-attachments/assets/615787ad-56ef-47c6-97fd-9d35a246666f" />
 
+**Note:** While testing the new `call_gemini()` function, I hit four separate failures in sequence, each needing a different fix rather than one generic "try again" approach:
 
+| # | Error | Root cause | Fix |
+|---|---|---|---|
+| 1 | `404 Not Found` on `gemini-2.0-flash` | Model had been deprecated by Google | Called `ListModels` to check which models my key could actually use, switched to the alias `gemini-flash-latest` as the unit spec originally recommended |
+| 2 | `503 Service Unavailable` | Free-tier model briefly overloaded (transient, server-side) | Added exponential backoff (2s, 4s retries) before giving up on a model |
+| 3 | `429 Too Many Requests` | Free-tier per-minute quota used up from repeated manual test runs during debugging | Learned 429 needs different handling than 503 - retrying immediately just burns more of the same limited quota, so it should move on rather than retry the same model |
+| 4 | Tried reverting to the original `google.generativeai` SDK version | `ModuleNotFoundError: No module named 'google.generativeai'` | Researched the error and found Google officially deprecated this SDK (end-of-life August 2025) in favour of calling the REST API directly or using the new `google-genai` package - confirmed staying with the `requests`-based version was the right long-term choice, not just a spec-compliance formality |
+
+**My Critique & Decision:** Rather than only adding retries, I restructured `call_gemini()` to try a short, ordered list of models (`gemini-flash-latest`, then `gemini-flash-lite-latest`, then `gemini-2.5-flash`), since each free-tier model has independent quota/load. On a `503` it retries the *same* model briefly (load is transient); on a `429` it moves straight to the *next* model (retrying the same one would waste quota); only once every model in the list has failed does it return an error message to the user. I tested this with an off-topic question ("What's the weather like in Perth today?") and confirmed both that a model succeeded despite earlier models having been rate-limited during debugging, *and* that the off-topic guardrail worked correctly - the assistant declined and redirected back to the student's $500/$300/$200 budget breakdown instead of answering about the weather.
 
 
 ---
@@ -141,6 +153,9 @@
 
 **Screenshot:**
 
+<img width="249" height="930" alt="image" src="https://github.com/user-attachments/assets/ba1bc131-d411-48ef-8b85-33460feaf805" />
+
+
 <img width="1777" height="581" alt="image" src="https://github.com/user-attachments/assets/9d61c5ac-79d3-40c5-9d67-7bd53d70894f" />
 
 ### AI Interaction #7: Testing the Pandas/CSV logic, not just calculate_budget (R5)
@@ -155,6 +170,9 @@
 
 **Screenshot:** 
 
+<img width="252" height="661" alt="image" src="https://github.com/user-attachments/assets/66353c92-a867-4f2a-b31a-1780ac024c06" />
+
+
 <img width="1444" height="705" alt="image" src="https://github.com/user-attachments/assets/8c4aa8e7-4107-4d35-b8e2-ce48c367eefe" />
 
 ### AI Interaction #8: Fixing a stale R4 Gradio cell left over from before the R1/R2 rewrites
@@ -166,3 +184,6 @@
 **AI's Response:** Found that the R4 cell was still the original, unedited version - it called `process_csv_income()`, which no longer exists after the R2 rewrite (replaced by `load_transactions_df` + `analyze_transactions` + `compare_to_recommended`), and used the old `google.generativeai` SDK pattern instead of the `requests`-based `ask_gemini_advisor()` from the R1 rewrite. Running the app as-is would throw `NameError` the moment a user clicked "Process CSV File" or "Ask Gemini Advisor". Rewrote `run_csv_processor()` and `run_ai_advisor()` to call the current function names and return the richer actual-vs-recommended breakdown instead of a flat net-income summary.
 
 **My Critique & Decision:** Accepted. This was a genuine bug, not a style choice - I'd updated three core functions over several sessions but hadn't checked that the interface calling them was updated too. Good reminder to always re-test the full `Run all` -> click through every tab flow after changing a function signature, not just the cell I was actively editing.
+**Screenshot:**
+<img width="369" height="798" alt="image" src="https://github.com/user-attachments/assets/03c61ece-1c2d-412b-b071-b38bb86d5a8f" />
+
