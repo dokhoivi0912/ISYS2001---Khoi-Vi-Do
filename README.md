@@ -15,103 +15,94 @@
 University students often struggle with managing limited monthly allowances, part-time wages, and daily living expenses. Without a structured budget, students frequently overspend on discretionary items ("Wants") before covering essential needs ("Essentials") or setting aside long-term savings.
 
 ### The Solution
-The **Student Budget Coach** is a user-friendly, interactive Python web application built using **Google Colab** and **Gradio**. It automates the widely recommended **50/30/20 financial rule** (allocating 50% of income to Essentials, 30% to Wants, and 20% to Savings). The application accepts income figures either via **manual numerical entry** or by analysing a real transaction history from a **CSV file** using **Pandas**, and delivers personalised advice powered by **Google Gemini AI**, grounded in the user's actual category-by-category spending rather than a single generic number.
+The **Student Budget Coach** is a user-friendly, interactive Python web application built using **Google Colab** and **Gradio**. It applies the widely recommended **50/30/20 financial rule** (50% Essentials, 30% Wants, 20% Savings) in two ways:
+
+1. **Manual entry:** the student types in a monthly income and gets the recommended dollar split.
+2. **Real transaction data:** the student uploads a **CSV of their own transactions**, which is analysed with **Pandas**. Each transaction is bucketed into Essentials / Wants / Savings / Income, and the app reports the **actual dollars and % spent per bucket** against the 50/30/20 target.
+
+A **Google Gemini** "Student Finance Advisor" then answers questions grounded in those real numbers (the manual budget figures, or the uploaded CSV's category breakdown) instead of giving generic advice.
 
 ---
 
 ## ✨ Requirements Alignment (R1 – R6)
 
-This project adheres to all six requirements outlined in the ISYS2001 Assessment 2 Specification:
-
-| Requirement | Implementation Detail | Status |
-| :--- | :--- | :---: |
-| **R1: Conversational AI Assistant** | Calls Google's Gemini API (`gemini-flash-latest`, with automatic fallback to other free models if one is temporarily overloaded) directly via the **`requests`** library, with a system instruction defining an empathetic "Student Finance Advisor" persona that politely declines off-topic questions and redirects to budgeting. | ✅ Pass |
-| **R2: Grounded in User Data** | Uses **Pandas** (`pd.read_csv`) to load `student_transactions.csv`, then buckets every transaction into Essentials / Wants / Savings / Income with a `CATEGORY_MAP` dictionary and a plain loop. Reports **actual dollars and % spent per category** against the 50/30/20 target, and both the Gemini advisor's reply and the Gradio CSV tab reflect this real breakdown — not a flat re-split of one summed total. | ✅ Pass |
-| **R3: Custom Analytical Tool** | Implemented `calculate_budget(income)` to compute exact 50/30/20 dollar breakdowns, handling non-numeric, zero, and negative income safely without crashing. | ✅ Pass |
-| **R4: Interactive Web Interface** | Designed a 3-tab user interface using **Gradio Blocks** (`gr.Blocks`) separating Manual Calculation, CSV File Processing, and Gemini AI Consulting, each wired to the current versions of the underlying functions. | ✅ Pass |
-| **R5: Robust Assertion Testing** | Verified business logic with `assert` statements across all four core functions (`calculate_budget`, `load_transactions_df`, `analyze_transactions`, `compare_to_recommended`): standard figures, boundary values ($0), negative input (-$50), floating decimals, a missing CSV file, a CSV missing required columns, non-numeric transaction amounts, an unrecognised category, and overspending (net income ≤ 0). | ✅ Pass |
-| **R6: Six-Step Problem-Solving Method** | Documented fully in `Assessment_2.ipynb` under explicit headings: Step 1 Understand the Problem, Step 2 Inputs/Outputs, Step 3 Worked Example, Step 4 Pseudocode, Step 5 Convert to Python, Step 6 Test with a Variety of Data — each step present and specific to this project. | ✅ Pass |
+| Requirement | Implementation Detail |
+| :--- | :--- |
+| **R1: Conversational AI Assistant** | Calls Google's Gemini API directly via the **`requests`** library (`requests.post()` to the REST endpoint). Uses `gemini-flash-latest`, with an ordered fallback list of other free models. A `SYSTEM_INSTRUCTION` defines a friendly "Student Finance Advisor" persona that stays on budgeting, politely declines off-topic questions and asks a short clarifying question when a request is unclear. The API key is read from Colab Secrets and is never stored in the notebook or repository. |
+| **R2: Grounded in User Data** | `load_transactions_df()` reads the CSV with Pandas, `analyze_transactions()` buckets every transaction using a `CATEGORY_MAP` dictionary and a plain `for` loop, and `compare_to_recommended()` reports actual spend per bucket against the 50/30/20 target. Both the **Tab 2 summary** and the **Tab 3 Gemini advisor** (when a CSV is uploaded) reflect this real breakdown, so different data gives different answers. |
+| **R3: Custom Analytical Tool** | `calculate_budget(income)` is my own logic that computes the 50/30/20 dollar breakdown. It rejects non-numeric, zero and negative income with a clear message instead of crashing, and is connected to Tab 1 of the interface. |
+| **R4: Interactive Web Interface** | A 3-tab **Gradio Blocks** app: (1) Manual Budget Calculator, (2) Process CSV Transactions, (3) Gemini AI Financial Advisor, with an optional CSV upload. Empty questions, missing files and bad CSVs return friendly messages instead of errors. |
+| **R5: Assertion Testing** | `run_all_tests()` runs 18 `assert` checks across `calculate_budget`, `load_transactions_df`, `analyze_transactions` and `compare_to_recommended`: standard figures, $0, negative income, decimals, non-numeric input, a missing file, a CSV missing columns, a non-numeric Amount, an empty DataFrame, an unrecognised category, and overspending (net income ≤ 0). Problems found and fixed while building are recorded in the diary. |
+| **R6: Six-Step Method** | Shown in `Assessment_2.ipynb` under explicit headings: Step 1 Understand the Problem, Step 2 Inputs/Outputs, Step 3 Worked Example, Step 4 Pseudocode, Step 5 Convert to Python, Step 6 Test with a Variety of Data. |
 
 ---
 
 ## 📊 Sample Inputs & Outputs
 
 ### 1. Manual Budget Calculation (Tab 1)
-* **Input:** Income = `$1000.00`
-* **Output:** `Essentials (50%): $500.00 | Wants (30%): $300.00 | Savings (20%): $200.00`
+* **Input:** Income = `1000`
+* **Output:**
+```text
+Essentials (50%): $500.00 | Wants (30%): $300.00 | Savings (20%): $200.00
+```
 
 ### 2. CSV Transaction Analysis (Tab 2)
-* **Input File:** `student_transactions.csv` (15 transactions including weekly allowance, part-time cafe wages, rent, groceries, coffee, textbooks, transport, and a refund).
-* **Analysis Output:**
-* Net income this period: $765.00
+* **Input file:** `student_transactions.csv` (15 transactions: income, rent, groceries, coffee, textbooks, transport and a refund).
+* **Output:**
+```text
+Net income this period: $765.00
 
-` Actual vs. recommended 50/30/20 split:`
-` Essentials: spent $690.95 (90.3% of income) vs. 50% target`
-` Wants: spent $13.50 (1.8% of income) vs. 30% target`
-` Savings: spent $0.00 (0.0% of income) vs. 20% target`
+Actual vs. recommended 50/30/20 split:
+Essentials: spent $690.95 (90.3% of income) vs. 50% target
+Wants: spent $13.50 (1.8% of income) vs. 30% target
+Savings: spent $0.00 (0.0% of income) vs. 20% target
+```
+This is grounded in the student's real category spending: two CSVs with the same total would no longer give the same result, because each category is tracked separately.
 
-  This grounds the output in the student's real category spending — two CSVs with the same total
-  income would no longer produce an identical result, because each category is tracked separately.
+### 3a. Gemini Advisor with a CSV (Tab 3, CSV uploaded)
+* **Input:** `student_transactions.csv` | **Question:** *"How am I doing with my budget?"*
+* **Output (real run):** *"You are doing an amazing job keeping your discretionary wants extremely low at just $13.50, but your essentials are currently taking up 90.3% of your income, leaving $0.00 for savings. To reach a healthier 50/30/20 balance, we need to look at ways to lower those essential costs so you can start putting money into your savings. Let's review your essential expenses together to see where we can trim the fat!"*
 
-### 3. Gemini AI Financial Consultation (Tab 3)
-* **Input:** Income = `$1000.00` | **User Question:** *"What's the weather like in Perth today?"* (off-topic test)
-* **Grounded AI Output:** *"I'm happy to chat, but I can only help you with your budget here! Let's keep our focus on your finances—would you like to review your $500 essentials, $300 wants, or $200 savings?"*
+### 3b. Gemini Advisor, off-topic guardrail (Tab 3, no CSV)
+* **Input:** Income = `1000` | **Question:** *"What's the weather like in Perth today?"*
+* **Output (real run):** *"I can only help with your budget here, so I won't be able to check the weather in Perth! However, I'd love to help you review your $500 essentials, $300 wants, or $200 savings goals. How can I assist you with your finances today?"*
 
 ---
 
-## 🛠️ Execution Guide for Google Colab
+## 🛠️ How to Run (Google Colab)
 
-1. **Open the Notebook:** Open `Assessment_2.ipynb` in Google Colab.
-2. **Setup Gemini API Key:**
-   * Acquire a free API key from [Google AI Studio](https://aistudio.google.com/apikey).
-   * On Colab's left sidebar, click the **Secrets 🔑** icon.
-   * Add a new secret named `GEMINI_API_KEY` and paste your key into the value field.
-   * Enable the **Notebook access** toggle for it.
-3. **Upload the CSV File:**
-   * On Colab's left sidebar, click the **Files 📁** icon.
-   * Upload `student_transactions.csv` to the session storage (or your own CSV with the same
-     columns: `Date, Description, Amount, Category`).
-4. **Launch the Application:**
-   * Run every cell from top to bottom (`Runtime` → `Run all`). Cells depend on each other in
-     order — a later cell will throw `NameError` if an earlier cell defining a function it calls
-     hasn't run yet.
-   * Interact with the app using the embedded Gradio panel or the generated public link
-     (`https://xxxx.gradio.live`).
+1. **Open the notebook:** open `Assessment_2.ipynb` in Google Colab (use the "Open in Colab" badge at the top of the notebook).
+2. **Add your Gemini API key:**
+   * Create a free key in [Google AI Studio](https://aistudio.google.com/apikey).
+   * In Colab's left sidebar click **Secrets 🔑**, add a secret named `GEMINI_API_KEY`, paste the key, and turn on **Notebook access**.
+3. **Upload the CSV:** in Colab's **Files 📁** sidebar, upload `student_transactions.csv` (or your own CSV with the columns `Date, Description, Amount, Category`).
+4. **Run everything:** choose `Runtime` → `Run all`. Cells depend on each other in order, so run them from top to bottom; a later cell raises `NameError` if an earlier cell that defines a function it uses has not run.
+5. **Use the app:** the last cell launches the Gradio interface. Use the embedded panel or the generated public link (`https://xxxx.gradio.live`).
 
 ---
 
 ## 🐛 Debugging & Reliability Notes
 
-Several real runtime issues were found and fixed during development, all documented with prompts
-and screenshots in `Developer_Diary.md`:
+Real problems found and fixed during development (prompts and screenshots are in `Developer_Diary.md`):
 
-* **Stale/duplicate function definitions (`NameError`):** Running a later cell without first
-  running the cell that defines a function it depends on threw `NameError: name 'calculate_budget'
-  is not defined`. Fixed by making dependent cells self-contained and always running the notebook
-  top to bottom.
-* **Deprecated model (`404 Not Found`):** `gemini-2.0-flash` had been removed from the available
-  model list. Diagnosed using the Gemini `ListModels` endpoint and switched to the
-  `gemini-flash-latest` alias, as the spec recommends, so the app automatically tracks Google's
-  current free Flash model.
-* **Transient server overload (`503 Service Unavailable`):** Added exponential backoff retries,
-  then a fallback across a short list of alternate free-tier models, so a temporarily busy model
-  doesn't fail the whole request.
-* **Free-tier rate limit (`429 Too Many Requests`):** Learned this needs different handling from a
-  503 — retrying immediately only burns more of the same quota — so the app surfaces a clear
-  "please wait" message instead of retrying blindly.
-* **Ungrounded CSV analysis:** The original `process_csv_income()` summed every transaction
-  (income minus expenses) into one number and re-applied the 50/30/20 split to it, so two
-  different CSVs with the same total produced identical results. Rewrote it as
-  `load_transactions_df()` + `analyze_transactions()` + `compare_to_recommended()` to compare
-  **actual spending per category** against the target — a genuine fix to meet R2.
-* **Stale Gradio interface:** After rewriting the R1 and R2 functions, the R4 Gradio cell still
-  called the old function names (`process_csv_income`, the old Gemini SDK pattern), which would
-  have thrown `NameError` the moment a user clicked a button. Fixed by syncing `run_csv_processor`
-  and `run_ai_advisor` to call the current functions.
-* **Scope check:** An early draft of the category-analysis code used `pandas .map()` with a
-  lambda function — technically correct, but outside what this unit actually taught. Rewritten
-  using a plain `for` loop with `if`/`elif` and dictionaries instead, so every line is something
-  explainable using only this unit's syllabus.
+* **`NameError` from cell order:** running a later cell before the cell defining `calculate_budget` failed. Fixed by making cells self-contained and running the notebook top to bottom.
+* **Deprecated model (`404 Not Found`):** `gemini-2.0-flash` was not available to my key. Diagnosed with the `ListModels` endpoint and switched to the `gemini-flash-latest` alias recommended by the spec.
+* **Server overload (`503`):** `call_gemini()` retries the *same* model with exponential backoff (2s, 4s), because the overload is temporary.
+* **Rate limit (`429`):** retrying the same model only wastes quota, so the app moves straight to the *next* model in the fallback list. A "please wait" message appears only if every model fails.
+* **Deprecated SDK:** reverting to `google.generativeai` raised `ModuleNotFoundError`; the SDK is deprecated, so the direct `requests` approach was kept.
+* **Ungrounded CSV analysis:** the first version summed all transactions into one number and re-split it, so two different CSVs with the same total gave identical results. Rewritten as `load_transactions_df()` + `analyze_transactions()` + `compare_to_recommended()` to compare actual spending per category.
+* **Stale Gradio interface:** after the R1/R2 rewrites the Gradio cell still called removed functions (`process_csv_income`). Fixed by syncing it to the current functions.
+* **CSV not reachable from the AI tab:** `ask_gemini_advisor_from_csv()` existed but was not connected to the interface. Added an optional CSV upload to Tab 3 so the advisor can be grounded in real spending from the UI.
+* **Scope check:** an early draft used `pandas .map()` with a lambda and `io.StringIO` for tests, which this unit did not teach. Rewritten with plain loops, `if`/`elif`, dictionaries and `open()`/`.write()`.
+
+---
+
+## ⚠️ Known Limitations
+
+* Categories outside `CATEGORY_MAP` are detected and listed in the analysis result, but the Gradio tabs do not display them yet; the map only covers the sample CSV's categories.
+* The free Gemini tier has rate limits and can be overloaded; the retry and model-fallback logic reduces this but cannot remove it.
+* Each upload is analysed on its own: there is no saved history, and every conversation starts fresh.
+* The 50/30/20 rule is a general guideline, not personalised financial advice.
 
 ---
 
@@ -119,8 +110,8 @@ and screenshots in `Developer_Diary.md`:
 
 ```text
 ISYS2001---Khoi-Vi-Do/
-├── Assessment_2.ipynb        # Main Colab notebook (6-step method, code, assert tests & Gradio app)
-├── student_transactions.csv  # Sample student financial transaction dataset for Pandas processing
-├── Developer_Diary.md        # Weekly development log tracking AI prompts, critiques, screenshots & debugs
-└── README.md                 # Executive project documentation & operational instructions
+├── Assessment_2.ipynb        # Colab notebook: six-step method, code, assert tests & Gradio app
+├── student_transactions.csv  # Sample transaction data for the Pandas analysis
+├── Developer_Diary.md        # Dated log of AI prompts, critiques, screenshots & debugging
+└── README.md                 # Project documentation and run instructions
 ```
