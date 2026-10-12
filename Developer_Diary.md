@@ -187,3 +187,16 @@
 **Screenshot:**
 <img width="369" height="798" alt="image" src="https://github.com/user-attachments/assets/03c61ece-1c2d-412b-b071-b38bb86d5a8f" />
 
+### AI Interaction #9: Wiring the CSV-grounded advisor into the Gradio interface (R2 + R4)
+
+**Date:** 2026-10-12
+
+**My Prompt:** "My `ask_gemini_advisor_from_csv()` exists but Tab 3 of my Gradio app only calls `ask_gemini_advisor(income, question)`, so a user can never get Gemini advice based on their real CSV through the interface. How do I add an optional CSV upload to Tab 3?"
+
+**AI's Response:** Pointed out the gap, and suggested adding an optional `gr.File` input to Tab 3 and an `if file_obj is not None` branch in `run_ai_advisor()` that calls `ask_gemini_advisor_from_csv()`, falling back to the manual-income path when no file is uploaded.
+
+**My Critique & Decision:** Accepted.
+**Screenshot:**
+<img width="743" height="539" alt="image" src="https://github.com/user-attachments/assets/078d10ca-d779-463f-9aee-14b23c70c109" />
+<img width="1425" height="629" alt="image" src="https://github.com/user-attachments/assets/85acf85f-a8a1-4238-9849-e9f3eb59dbbb" />
+
