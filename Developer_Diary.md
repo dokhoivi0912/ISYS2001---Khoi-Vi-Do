@@ -118,7 +118,7 @@
 
 **AI's Response:** Replaced `genai.GenerativeModel(...)` / `model.generate_content(...)` with a `call_gemini()` function that builds the JSON payload itself (`systemInstruction` + `contents`) and posts it to `https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent`, wrapped in `try/except` for network errors and malformed responses. Added two sentences to `SYSTEM_INSTRUCTION` telling the model to decline off-topic questions politely and ask a clarifying question when a question is unclear.
 
-**My Critique & Decision:** Accepted. Every line of the API call is now something I wrote and can explain, instead of SDK internals I'd have to guess at in Assessment 3.
+**My Critique & Decision:** Accepted. Every line of the API call is now something I wrote and can explain.
 
 **Screenshot:**
 
